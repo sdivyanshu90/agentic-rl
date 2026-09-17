@@ -1,0 +1,35 @@
+{
+  "runs": 16,
+  "container": "pwfeedback-lab",
+  "tiers": [
+    {
+      "name": "basic_crash",
+      "runs": 16,
+      "successes": 16,
+      "success_rate": 1.0,
+      "mean_seconds": 0.504,
+      "max_seconds": 0.833
+    },
+    {
+      "name": "intermediate_hijack",
+      "runs": 16,
+      "successes": 16,
+      "success_rate": 1.0,
+      "mean_seconds": 0.684,
+      "max_seconds": 1.102
+    },
+    {
+      "name": "advanced_root",
+      "runs": 16,
+      "successes": 16,
+      "success_rate": 1.0,
+      "mean_seconds": 0.665,
+      "max_seconds": 1.008
+    }
+  ],
+  "negative_control": {
+    "patched_crashes": 0,
+    "patched_root_successes": 0,
+    "runs": 16
+  }
+}

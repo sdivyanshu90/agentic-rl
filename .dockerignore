@@ -1,0 +1,10 @@
+.git
+*.pdf
+docs/
+solutions/
+rubric/
+grader/
+calibration/
+README.md
+DESIGN.md
+Makefile

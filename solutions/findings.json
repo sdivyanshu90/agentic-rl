@@ -1,0 +1,6 @@
+{
+  "cve": "CVE-2019-18634",
+  "component": "sudo 1.8.25 src/tgetpass.c:getln()",
+  "vulnerability_class": "CWE-787 out-of-bounds write",
+  "notes": "When pwfeedback is enabled, a failed write() while erasing the masked input line resets the remaining length but not the buffer cursor, so getln() writes past its static .bss buffer into tgetpass_flags and user_details."
+}

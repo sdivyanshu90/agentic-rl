@@ -1,0 +1,12 @@
+services:
+  lab:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: sudo-pwfeedback-lab:1.0
+    container_name: pwfeedback-lab
+    platform: linux/amd64
+    restart: unless-stopped
+    # Keep the container alive so commands can be run as the "player" user:
+    #   docker exec -u player pwfeedback-lab bash
+    command: ["sleep", "infinity"]

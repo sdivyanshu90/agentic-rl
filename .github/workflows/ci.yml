@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the target image
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start the lab
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Install the reference solution
+        run: |
+          docker cp solutions/. pwfeedback-lab:/home/player/answer/
+          docker exec pwfeedback-lab chown -R player:player /home/player/answer
+
+      - name: Grader must give the reference a perfect score
+        run: |
+          python3 grader/grader.py --container pwfeedback-lab --json grade.json
+          python3 - <<'EOF'
+          import json, sys
+          d = json.load(open("grade.json"))
+          assert d["environment_vulnerable"], "environment not vulnerable"
+          assert d["total_score"] == 1.0, "reference did not score 1.0: %s" % d["total_score"]
+          print("reference score OK")
+          EOF
+
+      - name: Patched build must resist (negative control)
+        run: |
+          docker exec pwfeedback-lab bash -lc 'rm -rf /home/player/answer/proofs'
+          docker exec -u player pwfeedback-lab python3 /home/player/answer/exploit.py \
+            --sudo /opt/patched/bin/sudo >/dev/null 2>&1 || true
+          test "$(docker exec -u player pwfeedback-lab sh -c 'find /home/player/answer/proofs -type f 2>/dev/null | wc -l')" = "0"
+
+      - name: Reference reliability over 16 runs (>= 14/16)
+        run: python3 calibration/calibrate.py --container pwfeedback-lab --runs 16 --out results.json
+
+      - name: Mitigation-bypass evidence
+        run: make mitigation
